@@ -73,6 +73,18 @@ public final class PIVKeyObjectPKI extends PIVKeyObject {
         super(id, modeContact, modeContactless, mechanism, role);
     }
 
+    private void feitian_bug(byte[] scratch) {
+        // special Feitian workaround for A40CR and A22CR cards
+
+        if (isCrtKey) {
+            RSAPrivateCrtKey priKey = (RSAPrivateCrtKey) keyPair.getPrivate();
+            short pLen = priKey.getP(scratch, (short) 0);
+            priKey.setP(scratch, (short) 0, pLen);
+            short qLen = priKey.getQ(scratch, (short) 0);
+            priKey.setQ(scratch, (short) 0, qLen);
+        }
+    }
+
     public void updateElement(byte element, byte[] buffer, short offset, short length) {
 
         switch (element) {
@@ -261,9 +273,10 @@ public final class PIVKeyObjectPKI extends PIVKeyObject {
                 publicKey != null && publicKey.isInitialized());
     }
 
-    public void generate() {
+    public void generate(byte[] scratch) {
         if (privateKey == null || publicKey == null) allocate();
         keyPair.genKeyPair();
+        feitian_bug(scratch);
     }
 
     public short encrypt(Cipher cipher, byte[] inBuffer, short inOffset, short inLength, byte[] outBuffer, short outOffset) {

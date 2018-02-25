@@ -1416,7 +1416,7 @@ public final class PIV {
 
         // STEP 1 - Generate the key pair
         PIVKeyObjectPKI keyPair = (PIVKeyObjectPKI)key;
-        keyPair.generate();
+        keyPair.generate(scratch);
 
         // STEP 2 - Prepare the outgoing public key
 
